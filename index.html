@@ -786,9 +786,9 @@
                             <strong>FRER은 성능 손실 없이 신뢰성을 추가한다!</strong><br>
                             <span style="font-size: 22px; color: var(--text-light); margin-top: 16px; display: block;">
                                 프레임 2배 복제 + <strong style="color: var(--accent);">R-TAG 8바이트 추가 (0.53% 오버헤드)</strong><br>
-                                → 오히려 레이턴시 <strong style="color: var(--success);">11.2% 개선</strong> (빠른 경로 자동 선택 효과)<br>
+                                → 레이턴시 <strong style="color: var(--success);">11.2% 개선 관찰</strong> (초기 측정, 추가 검증 예정)<br>
                                 <span style="font-size: 20px; margin-top: 12px; display: block;">
-                                    💪 하드웨어 가속으로 8바이트 추가에도 성능 저하 제로!
+                                    💪 하드웨어 가속으로 8바이트 추가에도 성능 저하 없음!
                                 </span>
                             </span>
                         </p>
@@ -873,7 +873,7 @@
                             <h4 style="color: var(--success); font-size: 24px; margin-bottom: 12px;">✓ 성능 데이터 제공</h4>
                             <p style="font-size: 20px; margin: 0; line-height: 1.6;">
                                 RFC 2544 표준 기반 측정 (418.55 Mbps, zero-loss)<br>
-                                Sockperf 비교 (11.2% 레이턴시 개선)<br>
+                                Sockperf 비교 (11.2% 레이턴시 개선 관찰, 재현성 검증 예정)<br>
                                 <strong style="color: var(--accent);">R-TAG 8바이트 (0.53%) 오버헤드에도 성능 저하 없음</strong><br>
                                 <strong>→ 정량적 성능 평가 및 오버헤드 분석</strong>
                             </p>
