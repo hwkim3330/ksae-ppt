@@ -410,15 +410,16 @@
 
                 <div class="grid-2" style="margin-top: 64px;">
                     <div>
-                        <h3 style="margin-bottom: 32px;">R-TAG 구조 (4바이트)</h3>
-                        <div style="background: #1E1E1E; color: #D4D4D4; padding: 32px; border-radius: 12px; font-family: monospace; font-size: 20px; line-height: 1.8;">
-                            <div style="color: #4EC9B0;">┌────────────┬─────────────┐</div>
-                            <div style="color: #4EC9B0;">│ EtherType  │  Sequence   │</div>
-                            <div style="color: #4EC9B0;">│  0xF1C1    │   Number    │</div>
-                            <div style="color: #4EC9B0;">│  (2 bytes) │  (2 bytes)  │</div>
-                            <div style="color: #4EC9B0;">└────────────┴─────────────┘</div>
-                            <div style="margin-top: 20px; color: #6A9955;">// 시퀀스: 0x0000 → 0xFFFF</div>
+                        <h3 style="margin-bottom: 32px;">R-TAG 구조 (8바이트)</h3>
+                        <div style="background: #1E1E1E; color: #D4D4D4; padding: 32px; border-radius: 12px; font-family: monospace; font-size: 18px; line-height: 1.8;">
+                            <div style="color: #4EC9B0;">┌────────────┬────────────┬──────────┬──────────────┐</div>
+                            <div style="color: #4EC9B0;">│ EtherType  │  Reserved  │ Sequence │   Original   │</div>
+                            <div style="color: #4EC9B0;">│  0xF1C1    │            │  Number  │  EtherType   │</div>
+                            <div style="color: #4EC9B0;">│  (2 bytes) │ (2 bytes)  │(2 bytes) │  (2 bytes)   │</div>
+                            <div style="color: #4EC9B0;">└────────────┴────────────┴──────────┴──────────────┘</div>
+                            <div style="margin-top: 20px; color: #6A9955;">// 시퀀스: 0x0000 → 0xFFFF (65535)</div>
                             <div style="color: #6A9955;">// 65536개 프레임 추적 가능</div>
+                            <div style="color: #6A9955;">// 총 8바이트 오버헤드</div>
                         </div>
 
                         <div style="margin-top: 32px;">
@@ -452,7 +453,7 @@
                             <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">2️⃣ 복제 + R-TAG 삽입</h4>
                             <p style="font-size: 22px; margin: 0; line-height: 1.6;">
                                 시퀀스 번호 생성 (0, 1, 2, ...)<br>
-                                R-TAG 삽입 (4바이트 추가)<br>
+                                R-TAG 삽입 (8바이트 추가)<br>
                                 2개 경로로 프레임 복제 전송
                             </p>
                         </div>
@@ -784,7 +785,7 @@
                         <p style="font-size: 26px; font-weight: 600; margin: 0; line-height: 1.6;">
                             <strong>FRER은 성능 손실 없이 신뢰성을 추가한다!</strong><br>
                             <span style="font-size: 22px; color: var(--text-light); margin-top: 16px; display: block;">
-                                프레임 2배 복제 + R-TAG 4바이트 추가<br>
+                                프레임 2배 복제 + R-TAG 8바이트 추가<br>
                                 → 오히려 레이턴시 11% 개선 (빠른 경로 자동 선택 효과)
                             </span>
                         </p>
@@ -973,9 +974,9 @@
                         </div>
 
                         <div class="card" style="padding: 32px; margin-bottom: 24px;">
-                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q2. R-TAG 4바이트 추가의 오버헤드는?</h4>
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q2. R-TAG 8바이트 추가의 오버헤드는?</h4>
                             <p style="margin: 0; line-height: 1.6;">
-                                <strong>A:</strong> 1518 바이트 프레임 기준 <strong>0.26% 미만</strong>입니다. 하드웨어 가속으로 처리되어 실제 성능 영향은 측정 불가능한 수준입니다.
+                                <strong>A:</strong> 1518 바이트 프레임 기준 <strong>0.53%</strong>입니다 (8/1518). 하드웨어 가속으로 처리되어 실제 성능 영향은 측정 불가능한 수준입니다.
                             </p>
                         </div>
 

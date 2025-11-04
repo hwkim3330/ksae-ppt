@@ -129,10 +129,11 @@ open http://localhost:8000/
 
 ```
 ✅ R-TAG EtherType 0xF1C1 확인
-   - 4바이트 태그가 정상적으로 삽입됨
+   - 8바이트 태그가 정상적으로 삽입됨
+   - 구조: EtherType(2B) + Reserved(2B) + Sequence(2B) + Original EtherType(2B)
 
 ✅ Sequence Number 단조 증가 (0, 1, 2, ...)
-   - 16-bit 카운터가 프레임마다 1씩 증가
+   - 16-bit 카운터가 프레임마다 1씩 증가 (최대 65535)
 
 ✅ 동일 Seq가 2개 포트에서 수신
    - 프레임 복제 기능 정상 동작 확인
