@@ -13,7 +13,8 @@
 - **부제**: Fail-Operational TSN 관점
 - **저자**: 김현우, 박부식
 - **소속**: 한국전자기술연구원 (KETI) 모빌리티플랫폼연구센터
-- **발표**: KSAE 모빌리티 플랫폼 컨퍼런스
+- **발표**: KSAE 모빌리티 플랫폼 컨퍼런스 2025
+- **논문**: [25AKSAEK0402.pdf](25AKSAEK0402.pdf)
 
 ---
 
@@ -24,19 +25,19 @@
 ### 핵심 성과
 
 ✅ **FRER 실제 구현 및 검증**
-- Kontron D10 (LAN9668) 기반 4-스위치 토폴로지
+- Microchip LAN9662 평가보드 기반 4-스위치 토폴로지
 - VCAP 규칙을 이용한 스트림 식별 및 복제/제거
-- Wireshark를 통한 R-TAG 및 시퀀스 번호 실증
+- Wireshark를 통한 R-TAG (0xF1C1) 및 시퀀스 번호 실증
 
-✅ **Fail-Operational 특성 입증**
-- 단일 장애 시 제로 패킷 손실 (0%)
-- 복구 시간 0ms (즉시 경로 전환)
-- ISO 26262 ASIL-D 요구사항 만족
+✅ **IEEE 802.1CB 표준 준수**
+- 시퀀스 번호 기반 프레임 복제
+- 하드웨어 가속 중복 제거
+- 제로 패킷 손실, 즉시 장애 전환 (이론적)
 
-✅ **성능 영향 최소화**
-- 레이턴시 거의 동일 (차이 < 0.5 ms)
-- 하드웨어 오프로드로 오버헤드 < 1 µs
-- 기가비트 성능 달성 (943 Mbps)
+✅ **Fail-Operational 설계**
+- ISO 26262 ASIL-D 요구사항 대응
+- SOTIF (ISO/PAS 21448) 불확실성 고려
+- 물리적으로 독립된 다중 경로 구성
 
 ---
 
@@ -45,17 +46,13 @@
 ```
 ksae-ppt/
 ├── README.md                      # 본 문서
+├── 25AKSAEK0402.pdf              # 논문 원본
+├── index.html                     # 발표 슬라이드 (메인)
 ├── docs/                          # 기술 문서
 │   ├── FRER_TECHNICAL.md         # FRER 기술 상세 설명
 │   ├── 5G_FRER_INTEGRATION.md    # 5G-URLLC와 FRER 통합
 │   └── AUTOMOTIVE_NETWORK.md     # 자율주행 네트워크 아키텍처
-├── slides/                        # 발표 자료
-│   └── presentation.html         # reveal.js 발표 슬라이드
-├── scripts/                       # 발표 대본
-├── images/                        # 다이어그램 및 이미지
-├── typst/                         # Typst 기술 문서
-└── assets/                        # 기타 자산
-    └── diagrams/                  # Mermaid/PlantUML 다이어그램
+└── slides/                        # 구버전 슬라이드 (백업)
 ```
 
 ---
@@ -66,7 +63,7 @@ ksae-ppt/
 
 **온라인 버전** (GitHub Pages):
 ```
-https://hwkim3330.github.io/ksae-ppt/slides/presentation.html
+https://hwkim3330.github.io/ksae-ppt/
 ```
 
 **로컬에서 실행**:
@@ -79,8 +76,13 @@ cd ksae-ppt
 python3 -m http.server 8000
 
 # 브라우저에서 열기
-open http://localhost:8000/slides/presentation.html
+open http://localhost:8000/
 ```
+
+### 논문 보기
+
+- **원본 PDF**: [25AKSAEK0402.pdf](25AKSAEK0402.pdf)
+- **발표 슬라이드**: 10개 슬라이드 (논문 내용 기반)
 
 ### 기술 문서 읽기
 
@@ -121,53 +123,52 @@ open http://localhost:8000/slides/presentation.html
 
 ## 📊 검증 결과
 
-### Wireshark 패킷 캡처
+### Wireshark 패킷 캡처 검증
+
+본 연구는 **Wireshark 패킷 분석**을 통해 FRER 동작을 실증적으로 검증하였습니다:
 
 ```
 ✅ R-TAG EtherType 0xF1C1 확인
+   - 4바이트 태그가 정상적으로 삽입됨
+
 ✅ Sequence Number 단조 증가 (0, 1, 2, ...)
-✅ 동일 Seq가 2개 포트에서 수신 (복제 검증)
-✅ S4에서 1개만 전달 (중복 제거 검증)
+   - 16-bit 카운터가 프레임마다 1씩 증가
+
+✅ 동일 Seq가 2개 포트에서 수신
+   - 프레임 복제 기능 정상 동작 확인
+
+✅ S4에서 1개만 전달
+   - 중복 제거 기능 정상 동작 확인
 ```
 
-### 성능 측정 (FRER vs Non-FRER)
-
-| 지표 | Non-FRER | FRER | 차이 |
-|------|----------|------|------|
-| **평균 레이턴시** | 0.401 ms | 0.356 ms | **-0.045 ms** |
-| **P99 레이턴시** | 0.478 ms | 0.431 ms | **-0.047 ms** |
-| **대역폭 (iperf3)** | - | **943 Mbps** | 94.3% 링크 활용 ✅ |
-
-**결론**: 레이턴시 거의 동일, 기가비트 성능 달성!
-
----
-
-## 🌐 5G-URLLC와 FRER 통합
-
-### End-to-End 신뢰성
-
-```
-차량 내부 (FRER) × 무선 (5G-URLLC) × MEC (FRER)
-   99.999%     ×     99.99%      ×  99.999%
-           = 99.998%+ 달성!
-```
+**논문 Photo 1 참조**: R-TAG 및 Sequence Number 검증 화면
 
 ---
 
 ## 🎯 핵심 기여
 
-1. **FRER 실제 구현 및 검증** - LAN9668 기반 4-스위치 토폴로지
-2. **Fail-Operational 입증** - 제로 패킷 손실, 0ms 복구
-3. **성능 영향 최소화** - 레이턴시 < 0.5 ms 차이
-4. **5G-URLLC 통합** - End-to-End 신뢰성 아키텍처
+1. **FRER 실제 구현** - Microchip LAN9662 평가보드 기반 4-스위치 토폴로지 설계
+2. **Wireshark 실증 검증** - R-TAG, 시퀀스 번호, 복제/제거 기능 확인
+3. **VCAP 규칙 기반 구현** - 하드웨어 가속을 통한 스트림 식별 및 처리
+4. **표준 준수** - IEEE 802.1CB, ISO 26262 ASIL-D, ISO/PAS 21448 SOTIF
 
 ---
 
-## 📈 향후 연구
+## 📈 향후 연구 계획
 
-- RFC 2544/2889/3918 표준 기반 성능 평가
-- 장애 시나리오 확대 (링크 단선, 스위치 고장)
-- 실차 환경 적용 (센서 데이터 전송, V2X)
+본 연구는 FRER 동작 검증에 중점을 두었으며, 향후 다음 연구를 수행할 예정입니다:
+
+### 정량적 성능 평가
+- **RFC 2544**: 처리율, 지연, 프레임 손실률 측정
+- **RFC 2889**: 브리지 포워딩 성능 평가
+- **RFC 3918**: 멀티캐스트 성능 측정
+
+### Fail-Operational 특성 검증
+- **단일 링크 단선**: S1-S2 경로 장애 시나리오
+- **스위치 노드 고장**: S3 전체 장애 시나리오
+- **다중 경로 동시 장애**: S1-S2 및 S1-S3 동시 장애 시나리오
+
+각 시나리오에서 **패킷 손실률**, **복구 시간**, **지연 변동성**을 측정할 계획입니다.
 
 ---
 
