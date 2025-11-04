@@ -376,7 +376,7 @@ Central Compute Unit (상단)
              ↓
 ┌─────────────────────────────────────────────────┐
 │ Hardware Level          Software Level          │
-│  • LAN9662 FRER HW     • FRER 드라이버          │
+│  • LAN9668 FRER HW     • FRER 드라이버          │
 │  • 이중 경로 배선      • VCAP 규칙 설정         │
 └────────────┬────────────────────────────────────┘
              ↓
@@ -437,7 +437,7 @@ FRER은 **신뢰성(Reliability)** 기술이지만, **보안(Security)** 측면�
 
 ## 6. 실제 구현 사례
 
-### 6.1 KETI LAN9662 4-Switch 토폴로지
+### 6.1 KETI LAN9668 4-Switch 토폴로지
 
 ```
    Host A (192.168.100.101)
@@ -584,7 +584,7 @@ iperf3 대역폭:
 1. **Critical Path 식별**: ASIL-D, ASIL-C 경로에 FRER 적용
 2. **물리적 경로 분리**: 좌/우측 배선, Zone 기반 다양성
 3. **TAS 결합**: 시간 슬롯 + FRER로 결정론 + 신뢰성
-4. **하드웨어 오프로드**: LAN9662 같은 TSN 스위치 사용
+4. **하드웨어 오프로드**: LAN9668 같은 TSN 스위치 사용
 5. **검증**: Wireshark로 R-TAG, 시퀀스 번호 확인
 
 ### 7.3 미래 전망
@@ -613,7 +613,7 @@ iperf3 대역폭:
 3. ISO/SAE 21434:2021, "Road vehicles — Cybersecurity engineering"
 4. SAE J3016, "Taxonomy and Definitions for Terms Related to Driving Automation Systems"
 5. AUTOSAR Adaptive Platform Release 22.11, "TSN Integration"
-6. Microchip LAN9662 TSN Evaluation Kit User Guide
+6. Kontron D10 (LAN9668) TSN Evaluation Kit User Guide
 
 ---
 

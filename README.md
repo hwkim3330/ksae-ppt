@@ -24,7 +24,7 @@
 ### 핵심 성과
 
 ✅ **FRER 실제 구현 및 검증**
-- Microchip LAN9662 기반 4-스위치 토폴로지
+- Kontron D10 (LAN9668) 기반 4-스위치 토폴로지
 - VCAP 규칙을 이용한 스트림 식별 및 복제/제거
 - Wireshark를 통한 R-TAG 및 시퀀스 번호 실증
 
@@ -156,7 +156,7 @@ open http://localhost:8000/slides/presentation.html
 
 ## 🎯 핵심 기여
 
-1. **FRER 실제 구현 및 검증** - LAN9662 기반 4-스위치 토폴로지
+1. **FRER 실제 구현 및 검증** - LAN9668 기반 4-스위치 토폴로지
 2. **Fail-Operational 입증** - 제로 패킷 손실, 0ms 복구
 3. **성능 영향 최소화** - 레이턴시 < 0.5 ms 차이
 4. **5G-URLLC 통합** - End-to-End 신뢰성 아키텍처

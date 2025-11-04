@@ -8,7 +8,7 @@
 1. [FRER 개요](#1-frer-개요)
 2. [R-TAG 구조 및 프레임 포맷](#2-r-tag-구조-및-프레임-포맷)
 3. [FRER 동작 메커니즘](#3-frer-동작-메커니즘)
-4. [Microchip LAN9662 구현](#4-microchip-lan9662-구현)
+4. [Kontron D10 (LAN9668) 구현](#4-microchip-lan9662-구현)
 5. [성능 검증 및 실측 데이터](#5-성능-검증-및-실측-데이터)
 6. [Fail-Operational 특성](#6-fail-operational-특성)
 7. [자율주행 차량 적용](#7-자율주행-차량-적용)
@@ -280,11 +280,11 @@ t=5    -                      Seq=2 도착 (5ms) ───→ [전달] ✅
 
 ---
 
-## 4. Microchip LAN9662 구현
+## 4. Kontron D10 (LAN9668) 구현
 
-### 4.1 LAN9662 TSN 스위치 개요
+### 4.1 LAN9668 TSN 스위치 개요
 
-**Microchip LAN9662**는 automotive-grade TSN 스위치 칩으로, FRER을 하드웨어 오프로드로 지원합니다.
+**Kontron D10 (LAN9668)**는 automotive-grade TSN 스위치 칩으로, FRER을 하드웨어 오프로드로 지원합니다.
 
 #### 주요 사양
 - 6포트 Gigabit Ethernet 스위치
@@ -297,7 +297,7 @@ t=5    -                      Seq=2 도착 (5ms) ───→ [전달] ✅
 ### 4.2 4-스위치 토폴로지 설계
 
 ```
-              S2 (LAN9662)
+              S2 (LAN9668)
              /  \
             /    \
            /      \
@@ -305,7 +305,7 @@ t=5    -                      Seq=2 도착 (5ms) ───→ [전달] ✅
            \      /
             \    /
              \  /
-              S3 (LAN9662)
+              S3 (LAN9668)
 
 경로1: A → S1 → S2 → S4 → B
 경로2: A → S1 → S3 → S4 → B
@@ -354,7 +354,7 @@ frer_member_stream:
 
 ### 4.4 하드웨어 오프로드 성능
 
-| 기능 | 소프트웨어 처리 | LAN9662 하드웨어 |
+| 기능 | 소프트웨어 처리 | LAN9668 하드웨어 |
 |------|----------------|------------------|
 | **프레임 복제** | ~100 µs (CPU) | **< 1 µs (ASIC)** |
 | **중복 제거** | ~200 µs (CPU) | **< 1 µs (ASIC)** |
@@ -369,7 +369,7 @@ frer_member_stream:
 
 ### 5.1 KETI 실험 환경 (논문)
 
-- **테스트 보드**: Microchip LAN9662 평가보드 × 4대
+- **테스트 보드**: Kontron D10 (LAN9668) 평가보드 × 4대
 - **네트워크**: 4-스위치 토폴로지 (S1-S2-S3-S4)
 - **트래픽**: UDP 브로드캐스트 (192.168.100.101 → 192.168.100.255)
 - **검증 도구**: Wireshark 패킷 캡처
@@ -386,7 +386,7 @@ frer_member_stream:
 ### 5.2 김현우 실험 데이터 (d10frertest)
 
 **테스트 환경:**
-- **장비**: Microchip LAN9662 + Linux PC (Ubuntu 22.04)
+- **장비**: Kontron D10 (LAN9668) + Linux PC (Ubuntu 22.04)
 - **NIC**: Intel i210 (enp11s0, enp15s0)
 - **IP**: 192.168.1.2 (송신) → 192.168.1.3 (수신)
 - **테스트**: RFC 2544 (Throughput, Latency), Sockperf
@@ -421,7 +421,7 @@ frer_member_stream:
 **핵심 발견:**
 - ✅ **레이턴시 거의 동일** (차이 0.3~0.4 ms, 오차 범위)
 - ✅ **FRER 오버헤드 미미함!** (2배 복제 + 4바이트 추가에도 성능 저하 없음)
-- ✅ **하드웨어 가속 효과** (LAN9662 ASIC 처리)
+- ✅ **하드웨어 가속 효과** (LAN9668 ASIC 처리)
 
 #### iperf3 대역폭 테스트
 
@@ -753,7 +753,7 @@ FRER Replication
 2. SAE J3016, "Taxonomy and Definitions for Terms Related to Driving Automation Systems"
 3. ISO 26262, "Road vehicles — Functional safety"
 4. ISO/PAS 21448, "Road vehicles — Safety of the intended functionality (SOTIF)"
-5. Microchip LAN9662 Data Sheet
+5. Kontron D10 (LAN9668) Data Sheet
 6. 김현우, 박부식, "자동차 이더넷의 신뢰성 확보를 위한 FRER 기반 TSN 이중화 기법 적용 및 성능 검증", KSAE, 2025
 
 ---
