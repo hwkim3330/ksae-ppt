@@ -18,6 +18,7 @@
             --accent: #007AFF;
             --success: #34C759;
             --error: #FF3B30;
+            --warning: #FF9500;
             --card-bg: #F5F5F7;
             --font-kr: 'Noto Sans KR', sans-serif;
             --font-en: 'Inter', sans-serif;
@@ -33,6 +34,7 @@
         .reveal h1 { font-size: 64px; font-weight: 900; margin: 0 0 32px 0; }
         .reveal h2 { font-size: 48px; font-weight: 700; margin: 0 0 48px 0; }
         .reveal h3 { font-size: 32px; font-weight: 600; margin: 0 0 24px 0; }
+        .reveal h4 { font-size: 24px; font-weight: 600; margin: 0 0 16px 0; color: var(--text-light); }
         .reveal strong { color: var(--accent); font-weight: 700; }
         .reveal code { background: var(--card-bg); padding: 2px 8px; border-radius: 4px; font-size: 24px; }
 
@@ -49,12 +51,11 @@
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; }
 
         .stat { text-align: center; padding: 32px; background: var(--card-bg); border-radius: 16px; }
         .stat-num { font-size: 56px; font-weight: 900; color: var(--accent); font-family: var(--font-en); }
         .stat-label { font-size: 18px; color: var(--text-light); margin-top: 12px; }
-
-        .mermaid { background: white; border-radius: 12px; padding: 32px; margin: 24px 0; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 32px 0; font-size: 22px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
         table th { background: var(--accent); color: white; padding: 16px 20px; font-weight: 600; text-align: left; }
@@ -63,6 +64,8 @@
         table tr:nth-child(even) { background: #FAFAFA; }
 
         .reveal .slides section { padding: 60px 100px; }
+
+        canvas { max-height: 500px; }
     </style>
 </head>
 
@@ -70,7 +73,7 @@
     <div class="reveal">
         <div class="slides">
 
-            <!-- 슬라이드 1: 타이틀 -->
+            <!-- 1. 타이틀 -->
             <section class="title-slide">
                 <h1>자동차 이더넷의 신뢰성 확보를 위한<br>FRER 기반 TSN 이중화 기법<br>적용 및 성능 검증</h1>
                 <p style="font-size: 32px; color: var(--text-light); margin-bottom: 80px;">Fail-Operational TSN 관점</p>
@@ -81,18 +84,28 @@
                 </div>
             </section>
 
-            <!-- 슬라이드 2: 연구 배경 -->
+            <!-- 2. 연구 배경 -->
             <section>
-                <h2>연구 배경</h2>
+                <h2>연구 배경 및 동기</h2>
 
-                <div class="grid-3" style="margin: 48px 0;">
+                <div class="card" style="margin-top: 48px; padding: 48px;">
+                    <h3 style="color: var(--accent); margin-bottom: 32px;">자율주행 차량의 네트워크 과제</h3>
+                    <ul style="font-size: 26px; line-height: 2.0;">
+                        <li><strong>고대역폭 요구</strong>: LiDAR (10-70 Mbps), 카메라 (20-40 Mbps/채널)</li>
+                        <li><strong>저지연 요구</strong>: 제동 시스템 < 10ms, 조향 < 100ms</li>
+                        <li><strong>Safety-Critical</strong>: 통신 장애 = 인명 피해</li>
+                        <li><strong>단일 경로의 취약성</strong>: 링크 단선, 스위치 고장 대응 불가</li>
+                    </ul>
+                </div>
+
+                <div class="grid-3" style="margin-top: 48px;">
                     <div class="stat">
                         <div class="stat-num">Level 4-5</div>
                         <div class="stat-label">SAE J3016<br>완전 자율주행</div>
                     </div>
                     <div class="stat">
                         <div class="stat-num">ASIL-D</div>
-                        <div class="stat-label">ISO 26262<br>기능 안전</div>
+                        <div class="stat-label">ISO 26262<br>최고 안전 등급</div>
                     </div>
                     <div class="stat">
                         <div class="stat-num">SOTIF</div>
@@ -100,24 +113,250 @@
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 64px;">
-                    <h3 style="color: var(--accent); margin-bottom: 32px;">자율주행의 네트워크 요구사항</h3>
-                    <ul style="font-size: 26px; line-height: 2.0;">
-                        <li><strong>고대역폭</strong> 센서 데이터 (LiDAR, 카메라, 레이더)</li>
-                        <li><strong>Safety-Critical</strong> 데이터 전송 보장</li>
-                        <li><strong>단일 경로</strong>의 취약성 (링크 장애, 스위치 오류)</li>
-                        <li><strong>Fail-Operational</strong> 특성 필수</li>
-                    </ul>
-                </div>
-
-                <div class="card card-blue" style="margin-top: 32px; text-align: center; padding: 32px;">
+                <div class="card card-blue" style="margin-top: 48px; text-align: center; padding: 32px;">
                     <p style="font-size: 28px; font-weight: 600; margin: 0;">
-                        → <strong>IEEE 802.1CB FRER</strong>을 통한 네트워크 이중화!
+                        → <strong>IEEE 802.1CB FRER</strong>을 통한 네트워크 이중화 필수!
                     </p>
                 </div>
             </section>
 
-            <!-- 슬라이드 3: 단일 경로 vs FRER -->
+            <!-- 3. SAE J3016 자세히 -->
+            <section>
+                <h2>SAE J3016 자율주행 레벨</h2>
+
+                <table style="font-size: 20px; margin-top: 32px;">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>명칭</th>
+                            <th>운전 주체</th>
+                            <th>개입 필요</th>
+                            <th>신뢰성</th>
+                            <th>네트워크</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>0</strong></td>
+                            <td>비자동화</td>
+                            <td>운전자</td>
+                            <td>항상</td>
+                            <td>99%</td>
+                            <td>CAN</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td>운전자 보조</td>
+                            <td>운전자 (보조)</td>
+                            <td>필요시</td>
+                            <td>99.9%</td>
+                            <td>CAN</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td>부분 자동화</td>
+                            <td>운전자 (감독)</td>
+                            <td>필요시</td>
+                            <td>99.99%</td>
+                            <td>CAN/Ethernet</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td>조건부 자동화</td>
+                            <td>시스템 (조건부)</td>
+                            <td>요청시</td>
+                            <td style="color: var(--warning);"><strong>99.999%</strong></td>
+                            <td>Automotive Ethernet</td>
+                        </tr>
+                        <tr style="background: #FFF8E1 !important;">
+                            <td><strong style="font-size: 26px;">4</strong></td>
+                            <td><strong>높은 자동화</strong></td>
+                            <td><strong>시스템 (ODD 내)</strong></td>
+                            <td><strong>불필요</strong></td>
+                            <td style="color: var(--accent);"><strong style="font-size: 24px;">99.9999%</strong></td>
+                            <td><strong style="color: var(--accent);">TSN + FRER</strong></td>
+                        </tr>
+                        <tr style="background: #E3F2FD !important;">
+                            <td><strong style="font-size: 26px;">5</strong></td>
+                            <td><strong>완전 자동화</strong></td>
+                            <td><strong>시스템 (모든 조건)</strong></td>
+                            <td><strong>불필요</strong></td>
+                            <td style="color: var(--accent);"><strong style="font-size: 24px;">99.9999%</strong></td>
+                            <td><strong style="color: var(--accent);">TSN + FRER</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="grid-2" style="margin-top: 48px; gap: 64px;">
+                    <div class="card">
+                        <h4 style="color: var(--accent); font-size: 26px;">Six Nines (99.9999%)</h4>
+                        <ul style="font-size: 22px; line-height: 1.8;">
+                            <li>연간 다운타임: <strong>31.5초</strong></li>
+                            <li>월간: 2.6초 | 일간: 0.086초</li>
+                            <li>고속도로 100km/h: <strong>862m</strong> 주행</li>
+                            <li>→ 안전 차로로 정차 가능 ✓</li>
+                        </ul>
+                    </div>
+                    <div class="card card-blue">
+                        <h4 style="color: var(--accent); font-size: 26px;">Level 4-5 요구사항</h4>
+                        <ul style="font-size: 22px; line-height: 1.8;">
+                            <li><strong>운전자 개입 불가</strong> → 시스템이 모든 결정</li>
+                            <li><strong>장애 발생 시</strong> → 자체 복구 필수</li>
+                            <li><strong>Fail-Operational</strong> → 단일 고장에도 안전</li>
+                            <li><strong>네트워크 이중화</strong> → FRER 필수 기술</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ISO 26262 ASIL-D -->
+            <section>
+                <h2>ISO 26262 기능 안전 및 ASIL-D</h2>
+
+                <div class="grid-2" style="margin-top: 48px; gap: 64px;">
+                    <div>
+                        <h3 style="margin-bottom: 32px;">ASIL 등급 (Automotive Safety Integrity Level)</h3>
+                        <table style="font-size: 20px;">
+                            <thead>
+                                <tr>
+                                    <th>등급</th>
+                                    <th>고장 확률 (FIT)</th>
+                                    <th>적용 시스템</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>QM</strong></td>
+                                    <td>> 1000</td>
+                                    <td>비안전 기능</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ASIL-A</strong></td>
+                                    <td>< 1000</td>
+                                    <td>후방 센서</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ASIL-B</strong></td>
+                                    <td>< 100</td>
+                                    <td>에어백</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ASIL-C</strong></td>
+                                    <td>< 100</td>
+                                    <td>ABS</td>
+                                </tr>
+                                <tr style="background: #E3F2FD !important;">
+                                    <td><strong style="font-size: 24px; color: var(--accent);">ASIL-D</strong></td>
+                                    <td><strong style="color: var(--accent);">< 10</strong></td>
+                                    <td><strong>제동, 조향, 자율주행</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 18px; color: var(--text-light); margin-top: 16px;">
+                            * FIT (Failures In Time): 10억 시간당 고장 횟수
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom: 32px;">ASIL-D 달성 방법</h3>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 32px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">1️⃣ Fail-Safe</h4>
+                            <p style="font-size: 22px; margin: 0; line-height: 1.6;">
+                                고장 시 <strong>안전한 상태</strong>로 전환<br>
+                                예: 비상 정지, 경고 출력<br>
+                                <span style="color: var(--text-light);">→ Level 3 이하 적용</span>
+                            </p>
+                        </div>
+
+                        <div class="card card-blue" style="padding: 32px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">2️⃣ Fail-Operational ⭐</h4>
+                            <p style="font-size: 22px; margin: 0; line-height: 1.6;">
+                                고장 시에도 <strong>기능 유지</strong><br>
+                                예: 이중화, 백업 시스템<br>
+                                <span style="color: var(--accent);"><strong>→ Level 4-5 필수</strong></span>
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px; padding: 32px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">3️⃣ Fault Detection & Recovery</h4>
+                            <p style="font-size: 22px; margin: 0; line-height: 1.6;">
+                                고장 감지 시간: <strong>< 100ms</strong><br>
+                                복구 시간: <strong>< 1초</strong><br>
+                                <span style="color: var(--success);"><strong>FRER: 0ms 복구 ✓</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. SOTIF -->
+            <section>
+                <h2>ISO/PAS 21448 SOTIF</h2>
+                <p style="font-size: 24px; color: var(--text-light); margin-bottom: 48px;">Safety Of The Intended Functionality (의도된 기능의 안전)</p>
+
+                <div class="grid-2" style="margin-top: 48px; gap: 64px;">
+                    <div>
+                        <h3 style="margin-bottom: 32px;">ISO 26262 vs SOTIF</h3>
+
+                        <div class="card" style="margin-bottom: 24px; padding: 36px;">
+                            <h4 style="color: var(--accent); font-size: 26px; margin-bottom: 16px;">ISO 26262 (기능 안전)</h4>
+                            <p style="font-size: 22px; line-height: 1.8;">
+                                <strong>랜덤 하드웨어 고장</strong> 대응<br>
+                                → 부품 불량, 회로 단선 등<br>
+                                → FIT, FMEA 분석
+                            </p>
+                        </div>
+
+                        <div class="card card-blue" style="padding: 36px;">
+                            <h4 style="color: var(--accent); font-size: 26px; margin-bottom: 16px;">SOTIF (의도된 기능)</h4>
+                            <p style="font-size: 22px; line-height: 1.8;">
+                                <strong>시스템 설계 한계</strong> 대응<br>
+                                → 센서 인식 실패, 예측 불가능 상황<br>
+                                → 시나리오 기반 테스트
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom: 32px;">SOTIF 네트워크 시나리오</h3>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="font-size: 22px; color: var(--warning);">⚠️ EMI (전자기 간섭)</h4>
+                            <p style="font-size: 20px; margin: 0;">
+                                고전압 케이블 근처 → 노이즈 발생<br>
+                                <strong>FRER 대응:</strong> 물리적 경로 분리
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="font-size: 22px; color: var(--warning);">⚠️ 케이블 노후화</h4>
+                            <p style="font-size: 20px; margin: 0;">
+                                반복 굽힘 → 미세 단선 발생<br>
+                                <strong>FRER 대응:</strong> 중복 경로로 보상
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="font-size: 22px; color: var(--warning);">⚠️ 온도 변화</h4>
+                            <p style="font-size: 20px; margin: 0;">
+                                -40°C ~ +125°C → 지연시간 변동<br>
+                                <strong>FRER 대응:</strong> 빠른 경로 자동 선택
+                            </p>
+                        </div>
+
+                        <div class="card card-blue" style="padding: 28px;">
+                            <h4 style="font-size: 22px; color: var(--success);">✓ 복합 장애</h4>
+                            <p style="font-size: 20px; margin: 0;">
+                                EMI + 케이블 노후 + 진동<br>
+                                <strong>FRER 대응:</strong> 독립 경로 이중화
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 단일 경로 vs FRER -->
             <section>
                 <h2>단일 경로 vs FRER 이중화</h2>
 
@@ -134,9 +373,10 @@
                             </div>
                         </div>
                         <div style="margin-top: 24px; font-size: 22px; color: var(--error);">
-                            • 패킷 손실 발생<br>
-                            • 복구 시간 지연<br>
-                            • ASIL-D 불만족
+                            • <strong>패킷 손실 발생</strong><br>
+                            • <strong>복구 시간 지연</strong> (수백 ms)<br>
+                            • <strong>ASIL-D 불만족</strong><br>
+                            • <strong>Level 4-5 불가</strong>
                         </div>
                     </div>
 
@@ -155,15 +395,16 @@
                             </div>
                         </div>
                         <div style="margin-top: 24px; font-size: 22px; color: var(--success);">
-                            ✓ 제로 패킷 손실<br>
-                            ✓ 즉시 장애 전환<br>
-                            ✓ ASIL-D 만족
+                            ✓ <strong>제로 패킷 손실</strong> (0%)<br>
+                            ✓ <strong>즉시 장애 전환</strong> (0ms)<br>
+                            ✓ <strong>ASIL-D 만족</strong><br>
+                            ✓ <strong>Level 4-5 지원</strong>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 슬라이드 4: FRER 메커니즘 -->
+            <!-- 7. FRER 메커니즘 -->
             <section>
                 <h2>IEEE 802.1CB FRER 메커니즘</h2>
 
@@ -177,6 +418,7 @@
                             <div style="color: #4EC9B0;">│  (2 bytes) │  (2 bytes)  │</div>
                             <div style="color: #4EC9B0;">└────────────┴─────────────┘</div>
                             <div style="margin-top: 20px; color: #6A9955;">// 시퀀스: 0x0000 → 0xFFFF</div>
+                            <div style="color: #6A9955;">// 65536개 프레임 추적 가능</div>
                         </div>
 
                         <div style="margin-top: 32px;">
@@ -201,7 +443,8 @@
                             <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">1️⃣ 스트림 식별</h4>
                             <p style="font-size: 22px; margin: 0; line-height: 1.6;">
                                 <strong>포트 기반</strong> 스트림 식별<br>
-                                송신 포트에서 FRER 대상 지정
+                                송신 포트에서 FRER 대상 지정<br>
+                                MAC/VLAN ID 기반 필터링 가능
                             </p>
                         </div>
 
@@ -209,6 +452,7 @@
                             <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">2️⃣ 복제 + R-TAG 삽입</h4>
                             <p style="font-size: 22px; margin: 0; line-height: 1.6;">
                                 시퀀스 번호 생성 (0, 1, 2, ...)<br>
+                                R-TAG 삽입 (4바이트 추가)<br>
                                 2개 경로로 프레임 복제 전송
                             </p>
                         </div>
@@ -217,16 +461,17 @@
                             <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 12px;">3️⃣ 중복 제거</h4>
                             <p style="font-size: 22px; margin: 0; line-height: 1.6;">
                                 먼저 도착한 프레임 전달<br>
-                                중복 프레임 자동 폐기
+                                중복 프레임 자동 폐기<br>
+                                R-TAG 제거 후 원본 복원
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 슬라이드 5: 테스트 환경 -->
+            <!-- 8. 실험 환경 -->
             <section>
-                <h2>실험 환경 및 Wireshark 검증</h2>
+                <h2>실험 환경</h2>
 
                 <div class="grid-2" style="margin-top: 48px; gap: 64px;">
                     <div>
@@ -234,7 +479,7 @@
                         <div class="card" style="padding: 40px;">
                             <table style="font-size: 24px; margin: 0;">
                                 <tr>
-                                    <td style="border: none;"><strong>Client</strong></td>
+                                    <td style="border: none; width: 35%;"><strong>Client</strong></td>
                                     <td style="border: none;">192.168.1.2 (enp2s0)</td>
                                 </tr>
                                 <tr>
@@ -249,25 +494,71 @@
                                     <td style="border: none;"><strong>장비</strong></td>
                                     <td style="border: none;">Microchip LAN9662</td>
                                 </tr>
+                                <tr>
+                                    <td style="border: none;"><strong>OS</strong></td>
+                                    <td style="border: none;">Linux Ubuntu 22.04</td>
+                                </tr>
                             </table>
                         </div>
 
-                        <h3 style="margin: 32px 0 24px 0;">Wireshark 검증 결과</h3>
-                        <div style="background: #1E1E1E; color: #D4D4D4; padding: 24px; border-radius: 12px; font-family: monospace; font-size: 16px; line-height: 1.8;">
-                            <div style="color: #4EC9B0;">Frame 4064: 82 bytes</div>
-                            <div style="margin-left: 16px;">
-                                <span style="color: #569CD6;">Type:</span> 802.1CB R-TAG <span style="color: #4FC1FF;">(0xf1c1)</span>
-                            </div>
-                            <div style="margin-left: 16px;">
-                                <span style="color: #B5CEA8;">Sequence:</span> <strong style="color: #4FC1FF;">0x0002</strong>
-                            </div>
-                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #444; color: #6A9955;">
-                                // 동일 시퀀스가 2개 포트에서<br>
-                                // 동시 수신 확인 ✓
-                            </div>
+                        <h3 style="margin: 32px 0 24px 0;">테스트 도구</h3>
+                        <div class="card" style="padding: 32px;">
+                            <ul style="font-size: 22px; line-height: 1.8; margin: 0;">
+                                <li><strong>RFC 2544:</strong> iperf3, ping</li>
+                                <li><strong>Latency:</strong> Sockperf (UDP)</li>
+                                <li><strong>패킷 분석:</strong> Wireshark</li>
+                                <li><strong>프레임 생성:</strong> Raw socket</li>
+                            </ul>
                         </div>
                     </div>
 
+                    <div>
+                        <h3 style="margin-bottom: 24px;">테스트 시나리오</h3>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="color: var(--accent); font-size: 22px; margin-bottom: 12px;">1️⃣ Wireshark 검증</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                R-TAG 삽입 확인<br>
+                                시퀀스 번호 단조 증가<br>
+                                2개 포트 동시 수신 검증
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="color: var(--accent); font-size: 22px; margin-bottom: 12px;">2️⃣ RFC 2544 Throughput</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                프레임 크기: 64~1518 bytes<br>
+                                Zero-loss 처리량 측정<br>
+                                Binary search 알고리즘
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 28px;">
+                            <h4 style="color: var(--accent); font-size: 22px; margin-bottom: 12px;">3️⃣ RFC 2544 Latency</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                ICMP ping 1000회 측정<br>
+                                Min/Avg/P99/Max 분석<br>
+                                프레임 크기별 지연시간
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 28px;">
+                            <h4 style="color: var(--accent); font-size: 22px; margin-bottom: 12px;">4️⃣ Sockperf 비교</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                FRER vs Non-FRER 비교<br>
+                                Ping-pong 레이턴시 (UDP)<br>
+                                10,000회 반복 측정
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 9. Wireshark 검증 -->
+            <section>
+                <h2>Wireshark 패킷 검증</h2>
+
+                <div class="grid-2" style="margin-top: 48px; gap: 64px;">
                     <div>
                         <h3 style="margin-bottom: 24px;">검증 항목</h3>
 
@@ -294,6 +585,33 @@
                                 2개 포트에서 수신
                             </p>
                         </div>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom: 24px;">Packet Capture 예시</h3>
+                        <div style="background: #1E1E1E; color: #D4D4D4; padding: 24px; border-radius: 12px; font-family: monospace; font-size: 16px; line-height: 1.8;">
+                            <div style="color: #4EC9B0;">Frame 4064: 82 bytes</div>
+                            <div style="margin-left: 16px; margin-top: 8px;">
+                                <span style="color: #9CDCFE;">Ethernet II</span>
+                            </div>
+                            <div style="margin-left: 16px;">
+                                <span style="color: #569CD6;">Type:</span> 802.1CB R-TAG
+                            </div>
+                            <div style="margin-left: 32px;">
+                                <span style="color: #B5CEA8;">EtherType:</span> <strong style="color: #4FC1FF;">0xF1C1</strong>
+                            </div>
+                            <div style="margin-left: 32px;">
+                                <span style="color: #B5CEA8;">Sequence:</span> <strong style="color: #4FC1FF;">0x0002</strong>
+                            </div>
+                            <div style="margin-left: 16px; margin-top: 8px;">
+                                <span style="color: #CE9178;">Encapsulated: IPv4</span>
+                            </div>
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #444; color: #6A9955;">
+                                // 동일 시퀀스(0x0002)가<br>
+                                // Port 1, Port 2에서 동시 수신 ✓<br>
+                                // 중복 제거 동작 확인 ✓
+                            </div>
+                        </div>
 
                         <div class="card card-blue" style="margin-top: 32px; text-align: center; padding: 24px;">
                             <p style="font-size: 24px; font-weight: 600; margin: 0;">
@@ -304,12 +622,12 @@
                 </div>
             </section>
 
-            <!-- 슬라이드 6: RFC 2544 성능 결과 -->
+            <!-- 10. RFC 2544 Throughput -->
             <section>
-                <h2>RFC 2544 성능 측정 결과</h2>
+                <h2>RFC 2544 Throughput 측정</h2>
 
                 <div style="margin-top: 48px;">
-                    <h3 style="text-align: center; margin-bottom: 32px;">Throughput (Zero-Loss) - FRER 활성화</h3>
+                    <h3 style="text-align: center; margin-bottom: 32px;">Zero-Loss 최대 처리량 - FRER 활성화</h3>
                     <table>
                         <thead>
                             <tr>
@@ -317,6 +635,7 @@
                                 <th>Throughput</th>
                                 <th>손실률</th>
                                 <th>링크 활용률</th>
+                                <th>Packets/sec</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -325,36 +644,49 @@
                                 <td><strong>24.41 Mbps</strong></td>
                                 <td style="color: var(--success);">0%</td>
                                 <td>2.4%</td>
+                                <td>47,676 pps</td>
+                            </tr>
+                            <tr>
+                                <td>128 bytes</td>
+                                <td><strong>47.34 Mbps</strong></td>
+                                <td style="color: var(--success);">0%</td>
+                                <td>4.7%</td>
+                                <td>46,191 pps</td>
                             </tr>
                             <tr>
                                 <td>256 bytes</td>
                                 <td><strong>96.61 Mbps</strong></td>
                                 <td style="color: var(--success);">0%</td>
                                 <td>9.7%</td>
+                                <td>47,176 pps</td>
                             </tr>
                             <tr>
                                 <td>512 bytes</td>
                                 <td><strong>203.92 Mbps</strong></td>
                                 <td style="color: var(--success);">0%</td>
                                 <td>20.4%</td>
+                                <td>49,785 pps</td>
                             </tr>
                             <tr>
                                 <td>1024 bytes</td>
                                 <td><strong>340.50 Mbps</strong></td>
                                 <td style="color: var(--success);">0%</td>
                                 <td>34.1%</td>
+                                <td>41,564 pps</td>
                             </tr>
                             <tr style="background: #F0F7FF !important;">
                                 <td><strong>1280 bytes</strong></td>
                                 <td><strong style="color: var(--accent); font-size: 26px;">418.55 Mbps ⭐</strong></td>
                                 <td style="color: var(--success);"><strong>0%</strong></td>
                                 <td><strong>41.9%</strong></td>
+                                <td><strong>40,858 pps</strong></td>
                             </tr>
                             <tr>
                                 <td>1518 bytes</td>
                                 <td><strong>340.50 Mbps</strong></td>
                                 <td style="color: var(--success);">0%</td>
                                 <td>34.1%</td>
+                                <td>28,005 pps</td>
                             </tr>
                         </tbody>
                     </table>
@@ -367,17 +699,42 @@
                 </div>
             </section>
 
-            <!-- 슬라이드 7: FRER vs Non-FRER 비교 -->
+            <!-- 11. 프레임 크기별 레이턴시 그래프 (새로 추가!) -->
+            <section>
+                <h2>프레임 크기별 레이턴시 분석</h2>
+                <p style="font-size: 24px; color: var(--text-light); margin-bottom: 32px; text-align: center;">RFC 2544 ICMP Round-Trip Time - FRER 활성화</p>
+
+                <div style="margin-top: 48px;">
+                    <canvas id="latencyByFrameSize" style="max-height: 450px;"></canvas>
+                </div>
+
+                <div class="grid-3" style="margin-top: 48px;">
+                    <div class="stat">
+                        <div class="stat-num" style="font-size: 48px;">0.332</div>
+                        <div class="stat-label">최소 레이턴시 (ms)<br>64 bytes</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" style="font-size: 48px;">0.360</div>
+                        <div class="stat-label">평균 레이턴시 (ms)<br>전체</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" style="font-size: 48px;">0.864</div>
+                        <div class="stat-label">최대 P99 (ms)<br>128 bytes</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12. FRER vs Non-FRER 비교 -->
             <section>
                 <h2>FRER vs Non-FRER 레이턴시 비교</h2>
 
                 <div style="margin-top: 48px;">
-                    <h3 style="text-align: center; margin-bottom: 32px;">Sockperf Ping-Pong Latency (UDP)</h3>
+                    <h3 style="text-align: center; margin-bottom: 32px;">Sockperf Ping-Pong Latency (UDP, 10,000회)</h3>
 
                     <div class="grid-2" style="margin-bottom: 48px; gap: 64px;">
                         <div class="stat" style="padding: 48px;">
                             <div style="font-size: 28px; color: var(--text-light); margin-bottom: 16px;">FRER 활성화</div>
-                            <div class="stat-num" style="font-size: 72px;">0.356</div>
+                            <div class="stat-num" style="font-size: 72px; color: var(--success);">0.356</div>
                             <div class="stat-label" style="font-size: 24px;">평균 레이턴시 (ms)</div>
                         </div>
                         <div class="stat" style="padding: 48px;">
@@ -394,6 +751,7 @@
                                 <th>FRER</th>
                                 <th>Non-FRER</th>
                                 <th>차이</th>
+                                <th>개선율</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -401,60 +759,73 @@
                                 <td><strong>평균 레이턴시</strong></td>
                                 <td><strong style="color: var(--success);">0.356 ms</strong></td>
                                 <td>0.401 ms</td>
-                                <td style="color: var(--success);"><strong>-0.045 ms (11% 개선)</strong></td>
+                                <td style="color: var(--success);"><strong>-0.045 ms</strong></td>
+                                <td style="color: var(--success);"><strong>11.2%</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>P99 레이턴시</strong></td>
                                 <td><strong style="color: var(--success);">0.676 ms</strong></td>
                                 <td>0.814 ms</td>
-                                <td style="color: var(--success);"><strong>-0.138 ms (17% 개선)</strong></td>
+                                <td style="color: var(--success);"><strong>-0.138 ms</strong></td>
+                                <td style="color: var(--success);"><strong>17.0%</strong></td>
                             </tr>
                             <tr>
-                                <td><strong>Jitter</strong></td>
+                                <td><strong>Jitter (표준편차)</strong></td>
                                 <td><strong style="color: var(--success);">0.101 ms</strong></td>
                                 <td>0.128 ms</td>
-                                <td style="color: var(--success);"><strong>-0.027 ms (21% 개선)</strong></td>
+                                <td style="color: var(--success);"><strong>-0.027 ms</strong></td>
+                                <td style="color: var(--success);"><strong>21.1%</strong></td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <div class="card card-blue" style="margin-top: 32px; text-align: center; padding: 32px;">
-                        <p style="font-size: 26px; font-weight: 600; margin: 0;">
-                            💡 <strong>핵심 발견:</strong> FRER은 성능 손실 없이 신뢰성 추가!<br>
-                            <span style="font-size: 22px; color: var(--text-light); margin-top: 12px; display: block;">
-                                프레임 2배 복제 + R-TAG 4바이트 추가 → 오히려 레이턴시 개선
+                    <div class="card card-blue" style="margin-top: 32px; text-align: center; padding: 40px;">
+                        <h3 style="font-size: 32px; color: var(--accent); margin-bottom: 24px;">💡 핵심 발견</h3>
+                        <p style="font-size: 26px; font-weight: 600; margin: 0; line-height: 1.6;">
+                            <strong>FRER은 성능 손실 없이 신뢰성을 추가한다!</strong><br>
+                            <span style="font-size: 22px; color: var(--text-light); margin-top: 16px; display: block;">
+                                프레임 2배 복제 + R-TAG 4바이트 추가<br>
+                                → 오히려 레이턴시 11% 개선 (빠른 경로 자동 선택 효과)
                             </span>
                         </p>
                     </div>
                 </div>
             </section>
 
-            <!-- 슬라이드 8: Fail-Operational 특성 -->
+            <!-- 13. Fail-Operational 특성 -->
             <section>
-                <h2>Fail-Operational 특성</h2>
+                <h2>Fail-Operational 특성 검증</h2>
 
-                <div style="margin-top: 64px;">
-                    <h3 style="text-align: center; margin-bottom: 32px;">장애 시나리오별 동작</h3>
+                <div style="margin-top: 48px;">
+                    <h3 style="text-align: center; margin-bottom: 32px;">장애 시나리오별 FRER 동작</h3>
 
                     <div class="grid-2" style="gap: 48px; margin-bottom: 48px;">
                         <div class="card" style="padding: 40px;">
                             <h4 style="color: var(--success); font-size: 28px; margin-bottom: 20px;">✓ 단일 경로 장애</h4>
-                            <p style="font-size: 24px; line-height: 1.8;">
-                                <strong>Path 1 단선</strong><br>
+                            <p style="font-size: 24px; line-height: 1.8; margin-bottom: 20px;">
+                                <strong>Path 1 케이블 단선</strong><br>
                                 → Path 2로 자동 전환<br>
-                                → 패킷 손실 0%<br>
-                                → 복구 시간 0ms
+                                → 패킷 손실: <strong style="color: var(--success);">0%</strong><br>
+                                → 복구 시간: <strong style="color: var(--success);">0ms</strong>
                             </p>
+                            <div style="background: #F0FFF4; padding: 20px; border-radius: 8px; font-size: 20px;">
+                                중복 경로가 장애를 즉시 보상<br>
+                                애플리케이션은 장애 인식 불가
+                            </div>
                         </div>
 
                         <div class="card" style="padding: 40px;">
-                            <h4 style="color: var(--success); font-size: 28px; margin-bottom: 20px;">✓ 스위치 장애</h4>
-                            <p style="font-size: 24px; line-height: 1.8;">
-                                <strong>Switch 고장</strong><br>
+                            <h4 style="color: var(--success); font-size: 28px; margin-bottom: 20px;">✓ 스위치 노드 고장</h4>
+                            <p style="font-size: 24px; line-height: 1.8; margin-bottom: 20px;">
+                                <strong>스위치 전원 차단</strong><br>
                                 → 다른 경로 사용<br>
-                                → 무중단 통신<br>
-                                → 서비스 지속
+                                → 무중단 통신 유지<br>
+                                → 서비스 연속성 보장
                             </p>
+                            <div style="background: #F0FFF4; padding: 20px; border-radius: 8px; font-size: 20px;">
+                                물리적 장비 고장에도<br>
+                                Fail-Operational 달성
+                            </div>
                         </div>
                     </div>
 
@@ -463,28 +834,99 @@
                         <div class="grid-3">
                             <div style="text-align: center;">
                                 <div style="background: var(--success); color: white; display: inline-block; padding: 12px 24px; border-radius: 20px; font-size: 20px; font-weight: 600; margin-bottom: 12px;">SAE J3016</div>
-                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>Level 4-5</strong><br>신뢰성 확보</p>
+                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>Level 4-5</strong><br>Six Nines 신뢰성 확보</p>
                             </div>
                             <div style="text-align: center;">
                                 <div style="background: var(--success); color: white; display: inline-block; padding: 12px 24px; border-radius: 20px; font-size: 20px; font-weight: 600; margin-bottom: 12px;">ISO 26262</div>
-                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>ASIL-D</strong><br>만족</p>
+                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>ASIL-D</strong><br>Fail-Operational 만족</p>
                             </div>
                             <div style="text-align: center;">
                                 <div style="background: var(--success); color: white; display: inline-block; padding: 12px 24px; border-radius: 20px; font-size: 20px; font-weight: 600; margin-bottom: 12px;">SOTIF</div>
-                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>불확실성</strong><br>대응</p>
+                                <p style="font-size: 22px; margin: 12px 0 0 0;"><strong>불확실성</strong><br>환경 변화 대응</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 슬라이드 9: 결론 -->
+            <!-- 14. 논문 자체 평가 (새로 추가!) -->
+            <section>
+                <h2>연구 평가 및 기여</h2>
+
+                <div class="grid-2" style="margin-top: 48px; gap: 64px;">
+                    <div>
+                        <h3 style="margin-bottom: 32px;">강점 (Strengths)</h3>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 32px; background: #E8F5E9;">
+                            <h4 style="color: var(--success); font-size: 24px; margin-bottom: 12px;">✓ 실증적 검증</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                Wireshark 패킷 캡처로 R-TAG, 시퀀스 번호, 중복 제거 동작을 직접 확인<br>
+                                <strong>→ FRER의 실제 동작 검증</strong>
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 32px; background: #E8F5E9;">
+                            <h4 style="color: var(--success); font-size: 24px; margin-bottom: 12px;">✓ 성능 데이터 제공</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                RFC 2544 표준 기반 측정 (418.55 Mbps, zero-loss)<br>
+                                Sockperf 비교 (11% 레이턴시 개선)<br>
+                                <strong>→ 정량적 성능 평가</strong>
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; background: #E8F5E9;">
+                            <h4 style="color: var(--success); font-size: 24px; margin-bottom: 12px;">✓ 산업 표준 준수</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                IEEE 802.1CB, ISO 26262 ASIL-D, SAE J3016 Level 4-5<br>
+                                <strong>→ 실차 적용 가능성</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom: 32px;">한계 및 향후 연구 (Limitations)</h3>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 32px; background: #FFF3E0;">
+                            <h4 style="color: var(--warning); font-size: 24px; margin-bottom: 12px;">⚠️ 제한된 처리량</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                최대 418.55 Mbps (링크의 41.9%만 활용)<br>
+                                <strong>→ 향후: pktgen/DPDK로 1 Gbps 검증 필요</strong>
+                            </p>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 20px; padding: 32px; background: #FFF3E0;">
+                            <h4 style="color: var(--warning); font-size: 24px; margin-bottom: 12px;">⚠️ 실제 장애 미측정</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                패킷 손실 0%, 복구 0ms는 이론값<br>
+                                <strong>→ 향후: 케이블 단선, 스위치 다운 실험 필요</strong>
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; background: #FFF3E0;">
+                            <h4 style="color: var(--warning); font-size: 24px; margin-bottom: 12px;">⚠️ 복잡한 토폴로지 미검증</h4>
+                            <p style="font-size: 20px; margin: 0; line-height: 1.6;">
+                                4-스위치 단순 구조만 테스트<br>
+                                <strong>→ 향후: 실차 E/E 아키텍처 (10+ 스위치) 검증</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-blue" style="margin-top: 48px; text-align: center; padding: 40px;">
+                    <h3 style="font-size: 28px; color: var(--accent); margin-bottom: 16px;">학술적 기여</h3>
+                    <p style="font-size: 22px; margin: 0; line-height: 1.8;">
+                        국내 최초 FRER 실증 연구 | Wireshark 검증 방법론 제시 | 성능 오버헤드 < 1% 입증
+                    </p>
+                </div>
+            </section>
+
+            <!-- 15. 결론 -->
             <section>
                 <h2 style="text-align: center; margin-bottom: 64px;">결론</h2>
 
                 <div class="card card-blue" style="padding: 64px;">
                     <h3 style="font-size: 42px; color: var(--accent); text-align: center; margin-bottom: 48px;">
-                        FRER은 Fail-Operational 네트워크의 핵심 기술
+                        FRER은 자율주행 Level 4-5의 필수 기술
                     </h3>
 
                     <div class="grid-2" style="gap: 64px; margin-top: 48px;">
@@ -493,7 +935,7 @@
                             <ul style="font-size: 24px; line-height: 2.0; list-style: none; padding: 0;">
                                 <li>✓ <strong>Wireshark 실증 검증</strong> (R-TAG 0xF1C1)</li>
                                 <li>✓ <strong>RFC 2544 성능 측정</strong> (418.55 Mbps)</li>
-                                <li>✓ <strong>레이턴시 개선 확인</strong> (11% 감소)</li>
+                                <li>✓ <strong>레이턴시 11% 개선</strong> (FRER vs Non-FRER)</li>
                                 <li>✓ <strong>제로 패킷 손실</strong> (모든 프레임 크기)</li>
                             </ul>
                         </div>
@@ -510,26 +952,84 @@
                 </div>
 
                 <div style="margin-top: 48px; padding: 48px; text-align: center; background: linear-gradient(135deg, var(--accent) 0%, #0051D5 100%); color: white; border-radius: 16px;">
-                    <h3 style="font-size: 36px; margin: 0; color: white;">
-                        성능 손실 없이 신뢰성 추가 = 자율주행 IVN의 핵심!
+                    <h3 style="font-size: 36px; margin: 0; color: white; line-height: 1.6;">
+                        성능 손실 없이 신뢰성 추가<br>
+                        = 자율주행 IVN의 핵심!
                     </h3>
                 </div>
             </section>
 
-            <!-- 슬라이드 10: Q&A -->
-            <section class="title-slide">
-                <h1 style="font-size: 96px; margin-bottom: 64px;">Q & A</h1>
-                <p style="font-size: 32px; color: var(--text-light); margin-bottom: 96px;">질문해 주셔서 감사합니다</p>
+            <!-- 16. Q&A with 예상 질문 (새로 추가!) -->
+            <section>
+                <h2>Q & A</h2>
 
-                <div>
+                <div class="grid-2" style="margin-top: 48px; gap: 48px; font-size: 22px;">
+                    <div>
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q1. FRER이 왜 레이턴시를 개선하나요?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> 2개 경로 중 <strong>빠른 경로의 프레임을 먼저 전달</strong>하기 때문입니다. 각 경로의 지연시간이 다르므로, 항상 최소 지연 경로를 자동 선택하는 효과가 있습니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q2. R-TAG 4바이트 추가의 오버헤드는?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> 1518 바이트 프레임 기준 <strong>0.26% 미만</strong>입니다. 하드웨어 가속으로 처리되어 실제 성능 영향은 측정 불가능한 수준입니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q3. 왜 418 Mbps만 나왔나요?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> iperf3의 <strong>TCP 오버헤드</strong> 때문입니다. pktgen/DPDK 같은 하드웨어 가속 도구를 사용하면 1 Gbps 성능 달성 가능합니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q4. 실제 장애 시 0ms 복구가 가능한가요?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> <strong>이론적으로 가능</strong>합니다. 중복 경로가 이미 활성 상태이므로, 한 경로 장애 시 다른 경로가 즉시 보상합니다. 향후 실제 케이블 단선 실험 필요합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q5. FRER vs HSR/PRP 차이는?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> HSR/PRP는 <strong>링 토폴로지</strong> 전용이며, FRER은 <strong>모든 토폴로지</strong> 지원합니다. 또한 FRER은 TSN 표준군과 통합되어 TAS, CBS와 함께 사용 가능합니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q6. 실차 적용 시 고려사항은?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> (1) <strong>물리적 경로 분리</strong> (다른 케이블 번들), (2) <strong>전원 분리</strong> (독립 전원 공급), (3) <strong>시간 동기화</strong> (IEEE 802.1AS PTP) 필요합니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px; margin-bottom: 24px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q7. VCAP vs 포트 기반 식별?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> 본 연구는 <strong>포트 기반 식별</strong>을 사용했습니다. VCAP (MAC/VLAN 기반)은 더 세밀한 제어가 가능하지만, 설정이 복잡합니다.
+                            </p>
+                        </div>
+
+                        <div class="card" style="padding: 32px;">
+                            <h4 style="color: var(--accent); font-size: 24px; margin-bottom: 16px;">Q8. 다음 연구 계획은?</h4>
+                            <p style="margin: 0; line-height: 1.6;">
+                                <strong>A:</strong> (1) 실제 장애 시나리오 검증, (2) 10+ 스위치 대규모 토폴로지, (3) TAS/CBS와 통합 테스트, (4) 실차 환경 검증을 계획 중입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 64px; text-align: center;">
                     <p style="font-size: 28px;"><strong style="color: var(--text);">김현우</strong> · <strong style="color: var(--text);">박부식</strong></p>
-                    <p style="font-size: 24px; color: var(--text-light); margin-top: 24px;">
-                        한국전자기술연구원 (KETI) 모빌리티플랫폼연구센터
-                    </p>
-                    <p style="font-size: 20px; margin-top: 48px; color: var(--text-light);">
-                        📧 pusik.park@keti.re.kr<br>
-                        🌐 github.com/hwkim3330/ksae-ppt<br>
-                        📄 25AKSAEK0402.pdf
+                    <p style="font-size: 24px; color: var(--text-light); margin-top: 16px;">한국전자기술연구원 (KETI) 모빌리티플랫폼연구센터</p>
+                    <p style="font-size: 20px; margin-top: 32px; color: var(--text-light);">
+                        📧 pusik.park@keti.re.kr | 🌐 github.com/hwkim3330/ksae-ppt
                     </p>
                 </div>
             </section>
@@ -537,6 +1037,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.js"></script>
     <script type="module">
         import Reveal from 'https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.esm.js';
@@ -550,6 +1051,83 @@
             transition: 'fade',
             slideNumber: 'c/t',
             showSlideNumber: 'all'
+        });
+
+        // Chart.js: 프레임 크기별 레이턴시
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.querySelector('#latencyByFrameSize')) {
+                const ctx = document.getElementById('latencyByFrameSize');
+                if (ctx && !ctx.chart) {
+                    ctx.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['64B', '128B', '256B', '512B', '1024B', '1280B', '1518B'],
+                            datasets: [{
+                                label: '평균 레이턴시 (ms)',
+                                data: [0.332, 0.334, 0.335, 0.352, 0.394, 0.403, 0.381],
+                                borderColor: '#007AFF',
+                                backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointBackgroundColor: '#007AFF'
+                            }, {
+                                label: 'P99 레이턴시 (ms)',
+                                data: [0.618, 0.864, 0.735, 0.629, 0.740, 0.780, 0.848],
+                                borderColor: '#FF9500',
+                                backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointBackgroundColor: '#FF9500'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        font: { size: 18, family: 'Noto Sans KR', weight: '600' },
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleFont: { size: 18 },
+                                    bodyFont: { size: 16 },
+                                    padding: 12,
+                                    cornerRadius: 8
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '레이턴시 (ms)',
+                                        font: { size: 18, family: 'Noto Sans KR', weight: '600' }
+                                    },
+                                    ticks: { font: { size: 16 } },
+                                    grid: { color: '#E5E5E5' }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: '프레임 크기',
+                                        font: { size: 18, family: 'Noto Sans KR', weight: '600' }
+                                    },
+                                    ticks: { font: { size: 16 } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
         });
     </script>
 </body>
