@@ -746,7 +746,37 @@ graph TB
                 </div>
             </section>
 
-            <!-- 슬라이드 9: Fail-Operational 검증 -->
+            <!-- 슬라이드 9: 성능 그래프 분석 -->
+            <section>
+                <h2>RFC 2544 성능 그래프 분석</h2>
+
+                <div class="grid-2" style="gap: 64px;">
+                    <div>
+                        <h3 style="font-size: 28px; margin-bottom: 24px;">프레임 크기별 레이턴시</h3>
+                        <canvas id="latencyChart" style="max-height: 400px;"></canvas>
+                    </div>
+
+                    <div>
+                        <h3 style="font-size: 28px; margin-bottom: 24px;">프레임 크기별 처리량</h3>
+                        <canvas id="throughputChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+
+                <div style="margin-top: 48px;">
+                    <h3 style="font-size: 28px; margin-bottom: 24px; text-align: center;">P99 레이턴시 비교</h3>
+                    <div style="max-width: 900px; margin: 0 auto;">
+                        <canvas id="p99Chart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+
+                <div class="apple-card" style="margin-top: 32px; text-align: center; background: linear-gradient(135deg, #F0F7FF 0%, #FFFFFF 100%);">
+                    <p style="font-size: 24px; color: var(--color-text-secondary);">
+                        <strong style="color: var(--color-accent);">FRER</strong>이 모든 프레임 크기에서 <strong>더 낮은 레이턴시</strong>와 <strong>더 높은 처리량</strong> 달성!
+                    </p>
+                </div>
+            </section>
+
+            <!-- 슬라이드 10: Fail-Operational 검증 -->
             <section>
                 <h2>Fail-Operational 검증</h2>
 
@@ -801,7 +831,7 @@ graph TB
                 </div>
             </section>
 
-            <!-- 슬라이드 10: TSN 표준 스택 -->
+            <!-- 슬라이드 11: TSN 표준 스택 -->
             <section>
                 <h2>TSN 표준 통합</h2>
 
@@ -840,7 +870,7 @@ graph TB
                 </div>
             </section>
 
-            <!-- 슬라이드 11: 핵심 기여 -->
+            <!-- 슬라이드 12: 핵심 기여 -->
             <section>
                 <h2>핵심 기여</h2>
 
@@ -887,7 +917,7 @@ graph TB
                 </div>
             </section>
 
-            <!-- 슬라이드 12: 결론 -->
+            <!-- 슬라이드 13: 결론 -->
             <section class="section-title">
                 <h2 style="font-size: 64px; margin-bottom: 48px;">결론</h2>
 
@@ -915,7 +945,7 @@ graph TB
                 </p>
             </section>
 
-            <!-- 슬라이드 13: Q&A -->
+            <!-- 슬라이드 14: Q&A -->
             <section class="title-slide">
                 <h1 style="font-size: 96px; margin-bottom: 48px;">Q & A</h1>
                 <p style="font-size: 32px; color: var(--color-text-secondary);">질문해 주셔서 감사합니다</p>
@@ -940,6 +970,7 @@ graph TB
         KSAE 모빌리티 플랫폼 · KETI 모빌리티플랫폼연구센터
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.js"></script>
     <script type="module">
         import Reveal from 'https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.esm.js';
@@ -974,6 +1005,336 @@ graph TB
 
             plugins: [ Mermaid ]
         });
+
+        // Chart.js 초기화 - 슬라이드 전환 시 차트 생성
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.querySelector('#latencyChart')) {
+                createCharts();
+            }
+        });
+
+        // 첫 로드 시에도 차트 생성 (현재 슬라이드가 차트 슬라이드인 경우)
+        Reveal.on('ready', event => {
+            if (event.currentSlide.querySelector('#latencyChart')) {
+                createCharts();
+            }
+        });
+
+        let chartsCreated = false;
+
+        function createCharts() {
+            if (chartsCreated) return;
+            chartsCreated = true;
+
+            const frameSizes = ['64B', '128B', '256B', '512B', '1024B', '1280B'];
+
+            // Apple 스타일 색상
+            const appleBlue = '#007AFF';
+            const appleRed = '#FF3B30';
+            const appleGray = '#86868B';
+
+            // 1. 레이턴시 차트
+            const latencyCtx = document.getElementById('latencyChart');
+            if (latencyCtx) {
+                new Chart(latencyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: frameSizes,
+                        datasets: [{
+                            label: 'Non-FRER',
+                            data: [0.401, 0.410, 0.425, 0.440, 0.455, 0.470],
+                            borderColor: appleRed,
+                            backgroundColor: appleRed + '20',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }, {
+                            label: 'FRER',
+                            data: [0.356, 0.365, 0.380, 0.395, 0.410, 0.425],
+                            borderColor: appleBlue,
+                            backgroundColor: appleBlue + '20',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    },
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { size: 16, family: 'Inter' },
+                                bodyFont: { size: 14, family: 'Inter' },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(3) + ' ms';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: '레이턴시 (ms)',
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    }
+                                },
+                                ticks: {
+                                    font: { size: 14, family: 'Inter' }
+                                },
+                                grid: {
+                                    color: '#D2D2D7'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '프레임 크기',
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    }
+                                },
+                                ticks: {
+                                    font: { size: 14, family: 'Inter' }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. 처리량 차트
+            const throughputCtx = document.getElementById('throughputChart');
+            if (throughputCtx) {
+                new Chart(throughputCtx, {
+                    type: 'line',
+                    data: {
+                        labels: frameSizes,
+                        datasets: [{
+                            label: 'Non-FRER',
+                            data: [23.44, 47.10, 94.62, 189.98, 378.91, 445.05],
+                            borderColor: appleRed,
+                            backgroundColor: appleRed + '20',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            fill: true
+                        }, {
+                            label: 'FRER',
+                            data: [24.41, 48.97, 98.04, 196.71, 390.64, 455.18],
+                            borderColor: appleBlue,
+                            backgroundColor: appleBlue + '20',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    },
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { size: 16, family: 'Inter' },
+                                bodyFont: { size: 14, family: 'Inter' },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' Mbps';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '처리량 (Mbps)',
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    }
+                                },
+                                ticks: {
+                                    font: { size: 14, family: 'Inter' }
+                                },
+                                grid: {
+                                    color: '#D2D2D7'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '프레임 크기',
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    }
+                                },
+                                ticks: {
+                                    font: { size: 14, family: 'Inter' }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. P99 레이턴시 비교 차트
+            const p99Ctx = document.getElementById('p99Chart');
+            if (p99Ctx) {
+                new Chart(p99Ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['평균 레이턴시', 'P99 레이턴시'],
+                        datasets: [{
+                            label: 'Non-FRER',
+                            data: [0.401, 0.478],
+                            backgroundColor: appleRed + 'CC',
+                            borderColor: appleRed,
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }, {
+                            label: 'FRER',
+                            data: [0.356, 0.431],
+                            backgroundColor: appleBlue + 'CC',
+                            borderColor: appleBlue,
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 18,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    },
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'rect'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { size: 16, family: 'Inter' },
+                                bodyFont: { size: 14, family: 'Inter' },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(3) + ' ms';
+                                    },
+                                    afterLabel: function(context) {
+                                        if (context.datasetIndex === 1) {
+                                            const nonFrer = context.chart.data.datasets[0].data[context.dataIndex];
+                                            const frer = context.parsed.y;
+                                            const improvement = ((nonFrer - frer) / nonFrer * 100).toFixed(1);
+                                            return '개선: ' + improvement + '%';
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: '레이턴시 (ms)',
+                                    font: {
+                                        size: 18,
+                                        family: 'Inter, -apple-system, sans-serif',
+                                        weight: '600'
+                                    }
+                                },
+                                ticks: {
+                                    font: { size: 16, family: 'Inter' }
+                                },
+                                grid: {
+                                    color: '#D2D2D7'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 16,
+                                        family: 'Inter',
+                                        weight: '600'
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
